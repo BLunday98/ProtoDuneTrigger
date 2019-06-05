@@ -16,11 +16,24 @@ TriggerCandidate.o: TriggerCandidate.cpp
 ModuleTrigger.o: ModuleTrigger.cpp
 	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
 
+OBJS := src/AdjacencyAlgorithms.o src/TriggerCandidate.o src/ModuleTrigger.o 
+OUTS := $(wildcard src/*.o) $(patsubst %.cc, %, $(wildcard src/*.cc))
+
 %.o: %.cc
 	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -o $*.o -c $*.cc
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -o $* AdjacencyAlgorithms.o TriggerCandidate.o ModuleTrigger.o $*.o
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -o $* $(OBJS) $*.o
 
-all: AdjacencyAlgorithms.o TriggerCandidate.o ModuleTrigger.o $(patsubst %.cc, %.o, $(wildcard *.cc))
+#Trigger Candidates
+TC_DIR := $(PWD)/src
+TC_SRC := $(wildcard  $(TC_DIR)/*.cc)
+TC_BIN := $(patsubst  $(TC_DIR)/%.cc,  $(TC_DIR)/%.o,  $(TC_SRC))
+
+#Module Level Trigger
+MLT_DIR := $(PWD)/src
+MLT_SRC := $(wildcard $(MLT_DIR)/*.cc)
+MLT_BIN := $(patsubst $(MLT_DIR)/%.cc, $(MLT_DIR)/%.o, $(MLT_SRC))
+
+all: $(OBJS) $(TC_BIN) $(MLT_BIN)
 
 clean:
-	rm -f $(wildcard *.o) $(patsubst %.cc, %, $(wildcard *.cc)) 
+	rm -f $(OBJS) $(OUTS)
