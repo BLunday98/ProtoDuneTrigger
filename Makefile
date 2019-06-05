@@ -7,21 +7,16 @@ CXXFLAGS=-std=c++14 -Wall -Werror -pedantic
 CXX=g++
 LDFLAGS=$$(root-config --libs --cflags)
 
-AdjacencyAlgorithms.o: AdjacencyAlgorithms.cpp
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
 
-TriggerCandidate.o: TriggerCandidate.cpp
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+####################################################################################################
 
-ModuleTrigger.o: ModuleTrigger.cpp
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+INCLUDES := ./include/*
+INCLUDE_DIR := -I./include
 
 OBJS := src/AdjacencyAlgorithms.o src/TriggerCandidate.o src/ModuleTrigger.o 
-OUTS := $(wildcard src/*.o) $(patsubst %.cc, %, $(wildcard src/*.cc))
+OUTS := $(wildcard */*.o) $(patsubst %.cc, %, $(wildcard */*.cc))
 
-%.o: %.cc
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -o $*.o -c $*.cc
-	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -o $* $(OBJS) $*.o
+####################################################################################################
 
 #Trigger Candidates
 TC_DIR := $(PWD)/src
@@ -33,7 +28,30 @@ MLT_DIR := $(PWD)/src
 MLT_SRC := $(wildcard $(MLT_DIR)/*.cc)
 MLT_BIN := $(patsubst $(MLT_DIR)/%.cc, $(MLT_DIR)/%.o, $(MLT_SRC))
 
-all: $(OBJS) $(TC_BIN) $(MLT_BIN)
+#Test 
+TEST_DIR := $(PWD)/test
+TEST_SRC := $(wildcard $(TEST_DIR)/*.cc)
+TEST_BIN := $(patsubst $(TEST_DIR)/%.cc, $(TEST_DIR)/%.o, $(TEST_SRC))
+
+####################################################################################################
+tcmlt: $(OBJS) $(TC_BIN) $(MLT_BIN) 
+
+test: $(OBJS) $(TEST_BIN)
+
+all: $(OBJS) $(TC_BIN) $(MLT_BIN) $(TEST_BIN)
+
+AdjacencyAlgorithms.o: AdjacencyAlgorithms.cpp
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+
+TriggerCandidate.o: TriggerCandidate.cpp
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+
+ModuleTrigger.o: ModuleTrigger.cpp
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) -c $< -o $@
+
+%.o: %.cc
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) $(INCLUDE_DIR) -o $*.o -c $*.cc
+	$(CXX) $(CPPFLAG) $(CXXFLAGS) $(LDFLAGS) $(INCLUDE_DIR) -o $* $(OBJS) $*.o
 
 clean:
-	rm -f $(OBJS) $(OUTS)
+	rm -f $(OBJS) $(OUTS) $(TEST_BIN)
