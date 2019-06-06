@@ -1,0 +1,11 @@
+# Object files
+*.o
+
+# binaries
+test/TestCandidates_check
+test/TestModule_check
+src/TestCandidates
+src/TestModule
+
+
+
